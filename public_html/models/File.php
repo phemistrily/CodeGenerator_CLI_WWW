@@ -32,6 +32,7 @@ class File
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
     header('Content-Length: ' . filesize($this->filePath));
+    
   }
 
   public function __destruct()

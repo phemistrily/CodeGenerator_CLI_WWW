@@ -13,12 +13,14 @@ class CodesController extends Controller
   public function generateCodes(int $numberOfCodes,int $lengthOfCode, string $renderBy = 'file')
   {
     $code = new Code();
-    for ($i = 0; $i < $numberOfCodes; $i++)
+    $pushedCodes = 0;
+    while ($pushedCodes < $numberOfCodes)
     {
       $newCode = $code->createCode($lengthOfCode);
       if(!$this->containsCode($newCode))
       {
         array_push($this->generatedCodes, $newCode);
+        $pushedCodes++;
       }
     }
     $this->renderCodes($renderBy);
@@ -26,11 +28,7 @@ class CodesController extends Controller
 
   private function containsCode($code)
   {
-    if(in_array($code, $this->generatedCodes))
-    {
-      return true;
-    }
-    return false;
+    return in_array($code, $this->generatedCodes);
   }
 
   private function renderCodes($renderBy)
