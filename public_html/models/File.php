@@ -11,23 +11,9 @@ class File
     $this->filePath = $metaData['uri'];
   }
 
-  public function searchLineInFile(String $lineData) :bool
+  public function writeInFile(string $line)
   {
-    fseek($this->file, 0);
-    if ($this->file) {
-        while (($line = fgets($this->file)) !== false) {
-          if($line == $lineData)
-            return false;
-        }
-    } else {
-        var_dump('can not load file');
-        die();
-    } 
-    return true;
-  }
-
-  public function writeInFile(String $line)
-  {
+    var_dump($line);
     fwrite($this->file, $line. PHP_EOL);
   }
 
@@ -46,7 +32,7 @@ class File
     header('Expires: 0');
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
-    header('Content-Length: ' . filesize($file->filePath));
+    header('Content-Length: ' . filesize($this->filePath));
   }
 
   public function __destruct()
