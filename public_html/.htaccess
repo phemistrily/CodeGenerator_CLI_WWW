@@ -1,0 +1,12 @@
+RewriteEngine On
+
+
+RewriteCond %{SCRIPT_FILENAME} !-f  
+RewriteRule ^(.*) ./index.php?path=$1 [L]
+
+<Files *.php>
+	Deny from all
+</Files>
+<Files index.php>
+	Allow from all
+</Files>
