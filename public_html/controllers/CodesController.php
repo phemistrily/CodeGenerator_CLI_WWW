@@ -53,8 +53,10 @@ class CodesController extends Controller
     {
       foreach ($this->generatedCodes as $code) {
         $file->writeInFile($code);
-        $file->readFile();
+        
       }
+      $file->readFile();
+      $file->downloadFile();
     }
     
   }

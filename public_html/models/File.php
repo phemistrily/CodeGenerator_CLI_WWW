@@ -13,7 +13,6 @@ class File
 
   public function writeInFile(string $line)
   {
-    var_dump($line);
     fwrite($this->file, $line. PHP_EOL);
   }
 
