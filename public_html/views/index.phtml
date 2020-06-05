@@ -1,4 +1,8 @@
-
+<?php if($this->message) {?>
+<div class="alert alert-danger">
+  <?= $this->message ?>
+</div>
+<?php } ?>
 <form action="/" method="POST">
   <div class="form-group">
     <label for="numberOfCodes">Ilość kodów do wygenerowania</label>
