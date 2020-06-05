@@ -170,21 +170,19 @@ class Boot
         'renderType' => 'cli',
         'file' => 'kody.txt'
       ];
-      if(in_array('--numberOfCodes', $argv))
-      {
-          $key = array_search('--numberOfCodes', $argv)+1;
-      }
-      $parmsArray['numberOfCodes'] = $argv[$key];
-      if(in_array('--lengthOfCode', $argv))
-      {
-          $key = array_search('--lengthOfCode', $argv)+1;
-      }
-      $parmsArray['lengthOfCode'] = $argv[$key];
-      if(in_array('--file', $argv))
-      {
-          $key = array_search('--file', $argv)+1;
-      }
-      $parmsArray['file'] = $argv[$key];
+      
+      $parmsArray['numberOfCodes'] = $this->setArgvParam($argv, '--numberOfCodes');
+      $parmsArray['lengthOfCode'] = $this->setArgvParam($argv, '--lengthOfCode');
+      $parmsArray['file'] = $this->setArgvParam($argv, '--file');
       return $parmsArray;
+  }
+
+  private function setArgvParam($argv, $param)
+  {
+    if(in_array($param, $argv))
+    {
+        $key = array_search($param, $argv)+1;
+    }
+    return $argv[$key];
   }
 }
