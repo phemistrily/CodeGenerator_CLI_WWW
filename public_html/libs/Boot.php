@@ -1,188 +1,182 @@
 <?php
 class Boot
 {
-  private $route;
-  private $controllerName;
-  private $controllerFile;
-  private $controller;
-  private $cliParms;
+    private $route;
+    private $controllerName;
+    private $controllerFile;
+    private $controller;
+    private $cliParms;
 
-  public function __construct($argc = null, $argv = null)
-  {
-    $this->loadFrameworkFiles();
-    if($argc && $argv) {
-      $actionKey = $this->getActionCli($argv);
-      $this->generateCliRouting($argv, $actionKey);
-      $this->setRequiredVariables();
-      $this->runCli($argv);
-    }
-    else if(!$this->checkIsPost())
+    public function __construct($argc = null, $argv = null)
     {
-      $this->generateGetRouting();
-      $this->setRequiredVariables();
-      $this->runPage();
+        $this->loadFrameworkFiles();
+        if($argc && $argv) {
+            $actionKey = $this->getActionCli($argv);
+            $this->generateCliRouting($argv, $actionKey);
+            $this->setRequiredVariables();
+            $this->runCli($argv);
+        }
+        else if(!$this->checkIsPost()) {
+            $this->generateGetRouting();
+            $this->setRequiredVariables();
+            $this->runPage();
+        }
+        else
+        {
+            $this->generatePostRouting();
+            $this->setRequiredVariables();
+            $this->runForm();
+        }
     }
-    else
+
+    private function loadFrameworkFiles()
     {
-      $this->generatePostRouting();
-      $this->setRequiredVariables();
-      $this->runForm();
+        include_once 'Controller.php';
+        include_once 'View.php';
     }
-  }
 
-  private function loadFrameworkFiles()
-  {
-    require_once('Controller.php');
-    require_once('View.php');
-  }
+    private function checkIsPost()
+    {
+        return isset($_POST['form']);
+    }
 
-  private function checkIsPost()
-  {
-    return isset($_POST['form']);
-  }
-
-  private function generateGetRouting()
-  {
-    $this->route = explode('/',rtrim($_SERVER['REQUEST_URI'], '/'));
-    if(!isset($this->route[1]))
-      $this->route[1] = '';
-    switch ($this->route[1]) {
-      case 'index':
-      case '':
-        $this->controllerName = "index";
-        break;
+    private function generateGetRouting()
+    {
+        $this->route = explode('/', rtrim($_SERVER['REQUEST_URI'], '/'));
+        if(!isset($this->route[1])) {
+            $this->route[1] = '';
+        }
+        switch ($this->route[1]) {
+        case 'index':
+        case '':
+            $this->controllerName = "index";
+            break;
       
-      default:
-        $this->controllerName = "notAuthorized";
-        break;
+        default:
+            $this->controllerName = "notAuthorized";
+            break;
+        }
     }
-  }
 
   
 
-  private function setRequiredVariables()
-  {
-    $this->controllerName = ucfirst($this->controllerName). 'Controller';
-    $this->controllerFile = sprintf('controllers/%s.php', $this->controllerName);
-  }
-
-  private function runPage()
-  {
-    if($this->importController())
+    private function setRequiredVariables()
     {
-      $this->runAction();
+        $this->controllerName = ucfirst($this->controllerName). 'Controller';
+        $this->controllerFile = sprintf('controllers/%s.php', $this->controllerName);
     }
-  }
+
+    private function runPage()
+    {
+        if($this->importController()) {
+            $this->runAction();
+        }
+    }
   
-  private function importController() :bool
-  {
-    if(file_exists($this->controllerFile))
+    private function importController() :bool
     {
-      require_once($this->controllerFile);
-      $this->controller = new $this->controllerName;
-      return true;
+        if(file_exists($this->controllerFile)) {
+            include_once $this->controllerFile;
+            $this->controller = new $this->controllerName;
+            return true;
+        }
+        else
+        {
+            var_dump('File Not found');
+            return false;
+        }
     }
-    else
-    {
-      var_dump('File Not found');
-      return false;
-    }
-  }
 
-  private function runAction()
-  {
-    if (isset($this->route[2])) {
-      $actionName = $this->route[2];
-      if(isset($this->route[3])) {
-        $this->controller->{$actionName}($this->route[3]);	
-      }
-      else {
-        $this->controller->{$actionName}();
-      }
-    }
-    else
+    private function runAction()
     {
-      $this->controller->index();
-    }				
-  }
+        if (isset($this->route[2])) {
+            $actionName = $this->route[2];
+            if(isset($this->route[3])) {
+                $this->controller->{$actionName}($this->route[3]);    
+            }
+            else {
+                $this->controller->{$actionName}();
+            }
+        }
+        else
+        {
+            $this->controller->index();
+        }                
+    }
   
-  private function generatePostRouting()
-  {
-    $this->formAction = $_POST['form'];
-    unset($_POST['form']);
-    $this->postParms = $_POST;
-    switch ($this->formAction) {
-      case 'generateCodes':
-        $this->controllerName = "codes";
-        break;
+    private function generatePostRouting()
+    {
+        $this->formAction = $_POST['form'];
+        unset($_POST['form']);
+        $this->postParms = $_POST;
+        switch ($this->formAction) {
+        case 'generateCodes':
+            $this->controllerName = "codes";
+            break;
       
-      default:
-        header('location: /');
-        break;
+        default:
+            header('location: /');
+            break;
+        }
     }
-  }
 
-  private function runForm()
-  {
-    if($this->importController())
+    private function runForm()
     {
-      $this->controller->{$this->formAction}(...array_values($this->postParms));
+        if($this->importController()) {
+            $this->controller->{$this->formAction}(...array_values($this->postParms));
+        }
     }
-  }
 
-  private function runCli()
-  {
-    if($this->importController())
+    private function runCli()
     {
-      $this->controller->{$this->cliAction}(...array_values($this->cliParms));
+        if($this->importController()) {
+            $this->controller->{$this->cliAction}(...array_values($this->cliParms));
+        }
     }
-  }
 
-  private function getActionCli($argv)
-  {
-    if(in_array('--action', $argv))
+    private function getActionCli($argv)
     {
-        $key = array_search('--action', $argv);
+        if(in_array('--action', $argv)) {
+            $key = array_search('--action', $argv);
+        }
+        return $key+1;
     }
-    return $key+1;
-  }
 
-  private function generateCliRouting($argv, $actionKey)
-  {
-    switch ($argv[$actionKey]) {
-      case 'generateCodes':
-        $this->cliAction = 'generateCodes';
-        $this->controllerName = 'codes';
-        $this->cliParms = $this->setParmsForGenerateCodes($argv);
-        break;
+    private function generateCliRouting($argv, $actionKey)
+    {
+        switch ($argv[$actionKey]) {
+        case 'generateCodes':
+            $this->cliAction = 'generateCodes';
+            $this->controllerName = 'codes';
+            $this->cliParms = $this->setParmsForGenerateCodes($argv);
+            break;
       
-      default:
-        die('no permission');
+        default:
+            die('no permission');
         break;
+        }
     }
-  }
 
-  private function setParmsForGenerateCodes($argv)
-  {
-      $parmsArray = [
+    private function setParmsForGenerateCodes($argv)
+    {
+        $parmsArray = [
         'numberOfCodes' => 100,
         'lengthOfCode' => 10,
         'renderType' => 'cli',
         'file' => 'kody.txt'
-      ];
+        ];
       
-      $parmsArray['numberOfCodes'] = $this->setArgvParam($argv, '--numberOfCodes');
-      $parmsArray['lengthOfCode'] = $this->setArgvParam($argv, '--lengthOfCode');
-      $parmsArray['file'] = $this->setArgvParam($argv, '--file');
-      return $parmsArray;
-  }
-
-  private function setArgvParam($argv, $param)
-  {
-    if(in_array($param, $argv))
-    {
-        $key = array_search($param, $argv)+1;
+        $parmsArray['numberOfCodes'] = $this->setArgvParam($argv, '--numberOfCodes');
+        $parmsArray['lengthOfCode'] = $this->setArgvParam($argv, '--lengthOfCode');
+        $parmsArray['file'] = $this->setArgvParam($argv, '--file');
+        return $parmsArray;
     }
-    return $argv[$key];
-  }
+
+    private function setArgvParam($argv, $param)
+    {
+        if(in_array($param, $argv)) {
+            $key = array_search($param, $argv)+1;
+        }
+        return $argv[$key];
+    }
 }
