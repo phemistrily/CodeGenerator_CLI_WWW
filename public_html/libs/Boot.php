@@ -74,8 +74,9 @@ class Boot
             return true;
         }
         catch (\Throwable $th) {
-            var_dump($th);
-            var_dump('File Not found');
+            header('location: /');
+            // var_dump($th);
+            // var_dump('File Not found');
             return false;
         }
     }

@@ -23,8 +23,15 @@ class Code
         $this->charsetLength = strlen($this->options['allowCharset']);
     }
 
-    public function createCode(int $lengthOfCode)
+    public function createCode($lengthOfCode)
     {
+        $this->recognizeCodeCharacters($lengthOfCode);
+        for ($key = 0; $key < strlen($this->code); $key++) {
+            if ($this->code[$key] == ' ') {
+                $this->code[$key] = $this->options['allowCharset'][rand(0, $this->charsetLength-1)];
+            }
+        }
+        return $this->code;
         $this->recognizeCodeCharacters($lengthOfCode);
         for ($key = 0; $key < strlen($this->code); $key++) {
             if ($this->code[$key] == ' ') {
