@@ -95,7 +95,6 @@ class CodesController extends App\Controller
 
     private function generateFile($file)
     {
-        //$file->readFile();
         $file->downloadFile();
     }
 

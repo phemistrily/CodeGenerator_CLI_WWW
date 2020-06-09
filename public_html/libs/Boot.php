@@ -11,6 +11,12 @@ class Boot
     private $controller;
     private $cliParms;
 
+    /**
+     * Define by type:
+     * - cli
+     * - get
+     * - post
+     */
     public function __construct($argc = null, $argv = null)
     {
         
