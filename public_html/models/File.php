@@ -1,4 +1,6 @@
 <?php
+namespace App\Models;
+
 class File
 {
     public $file;
@@ -14,7 +16,7 @@ class File
 
     private function checkFileExist()
     {
-        if(!$this->file) {
+        if (!$this->file) {
             header('location: /index/index/fileNotCreated');
         }
     }

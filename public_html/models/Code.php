@@ -1,4 +1,6 @@
 <?php
+namespace App\Models;
+
 class Code
 {
     private $code;
@@ -15,7 +17,7 @@ class Code
 
     private function setOptions($options)
     {
-        if(!empty($options) && is_array($options)) {
+        if (!empty($options) && is_array($options)) {
             $this->options = array_merge($this->options, $options);
         }
         $this->charsetLength = strlen($this->options['allowCharset']);
@@ -24,9 +26,8 @@ class Code
     public function createCode(int $lengthOfCode)
     {
         $this->recognizeCodeCharacters($lengthOfCode);
-        for($key = 0; $key < strlen($this->code); $key++)
-        {
-            if($this->code[$key] == ' ') {
+        for ($key = 0; $key < strlen($this->code); $key++) {
+            if ($this->code[$key] == ' ') {
                 $this->code[$key] = $this->options['allowCharset'][rand(0, $this->charsetLength-1)];
             }
         }
@@ -37,12 +38,11 @@ class Code
     {
         $this->code = '';
         $regexCharacters = str_split($this->options['regexCharacters']);
-        while($lengthLeft > 0)
-        {
+        while ($lengthLeft > 0) {
             foreach ($regexCharacters as $key => $character) {
                 switch ($character) {
                 case '\\':
-                    if($regexCharacters[$key+1] == '*') {
+                    if ($regexCharacters[$key+1] == '*') {
                         $this->addNullCharactersToCode($lengthLeft);
                         $lengthLeft -= $lengthLeft;
                     }
@@ -71,7 +71,7 @@ class Code
 
     private function addNullCharactersToCode($lengthOfNulls)
     {
-        for($i = 0; $i < $lengthOfNulls; $i++) {
+        for ($i = 0; $i < $lengthOfNulls; $i++) {
             $this->code .= ' ';
         }
     }

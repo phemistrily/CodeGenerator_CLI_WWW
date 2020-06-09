@@ -1,5 +1,5 @@
 <?php
-require_once 'ControllerInterface.php';
+namespace App;
 
 class Controller implements ControllerInterface
 {

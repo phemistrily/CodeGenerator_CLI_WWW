@@ -1,4 +1,11 @@
 {
+  "autoload": {
+    "psr-4": {
+      "App\\Models\\": "public_html/models",
+      "App\\Controllers\\": "public_html/controllers",
+      "App\\": "public_html/libs"
+    }
+  },
   "require-dev": {
     "squizlabs/php_codesniffer": "3.*"
   }

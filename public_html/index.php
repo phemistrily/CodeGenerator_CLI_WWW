@@ -1,10 +1,8 @@
 <?php
+require_once '../vendor/autoload.php';
 set_time_limit(0);
-require_once 'libs/Boot.php';
-if(isset($argc) && $argc > 1) {
-    new Boot($argc, $argv);
-}
-else
-{
-    new Boot();
+if (isset($argc) && $argc > 1) {
+    new App\Boot($argc, $argv);
+} else {
+    new App\Boot();
 }

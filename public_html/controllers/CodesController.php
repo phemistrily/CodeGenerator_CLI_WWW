@@ -1,7 +1,10 @@
 <?php
-require_once 'models/Code.php';
-require_once 'models/File.php';
-class CodesController extends Controller
+namespace App\Controllers;
+
+use App\Models;
+use App;
+
+class CodesController extends App\Controller
 {
     private $generatedCodes = array();
     private const REQUIRED_FAIL_ATTEMPTS_TO_FAIL = 100000;
@@ -17,12 +20,12 @@ class CodesController extends Controller
     public function generateCodes($numberOfCodes,$lengthOfCode, $renderBy = self::DEFAULT_RENDER_BY, $filePath = self::DEFAULT_FILENAME)
     {
         $this->vaildParamsForGenerateCodes($numberOfCodes, $lengthOfCode);
-        $code = new Code();
+        $code = new Models\Code();
         $pushedCodes = 0;
         $failAttempts = 0;
         while ($pushedCodes < $numberOfCodes && $failAttempts < self::REQUIRED_FAIL_ATTEMPTS_TO_FAIL) {
             $newCode = $code->createCode($lengthOfCode);
-            if(!$this->containsCode($newCode)) {
+            if (!$this->containsCode($newCode)) {
                 array_push($this->generatedCodes, $newCode);
                 $pushedCodes++;
             }
@@ -31,7 +34,7 @@ class CodesController extends Controller
                 $failAttempts++;
             }
         }
-        if($failAttempts < self::REQUIRED_FAIL_ATTEMPTS_TO_FAIL) {
+        if ($failAttempts < self::REQUIRED_FAIL_ATTEMPTS_TO_FAIL) {
             $this->renderCodes($renderBy, $filePath);
         }
         else {
@@ -41,7 +44,7 @@ class CodesController extends Controller
 
     private function vaildParamsForGenerateCodes($numberOfCodes, $lengthOfCode)
     {
-        if(!is_numeric($numberOfCodes) || $numberOfCodes <= 0 || !is_numeric($lengthOfCode) || $lengthOfCode <= 0) {
+        if (!is_numeric($numberOfCodes) || $numberOfCodes <= 0 || !is_numeric($lengthOfCode) || $lengthOfCode <= 0) {
             header('location: /index/index/paramsNotCorrect');
         }
     }
@@ -55,12 +58,12 @@ class CodesController extends Controller
     {
         switch ($renderBy) {
         case 'file':
-            $file = new File();
+            $file = new Models\File();
             $this->writeCodesInFile($file);
             $this->generateFile($file);
             break;
         case 'cli':
-            $file = new File();
+            $file = new Models\File();
             $this->writeCodesInFile($file);
             $this->createFileOnServer($file, $filePath);
             break;
@@ -85,7 +88,7 @@ class CodesController extends Controller
 
     private function writeCodesInFile($file)
     {
-        if(is_array($this->generatedCodes)) {
+        if (is_array($this->generatedCodes)) {
             $file->writeArrayInFile($this->generatedCodes);
         }
     }

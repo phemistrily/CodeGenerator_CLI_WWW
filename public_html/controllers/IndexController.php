@@ -1,6 +1,9 @@
 <?php
+namespace App\Controllers;
 
-class IndexController extends Controller
+use App;
+
+class IndexController extends App\Controller
 {
     public function index($message = null)
     {

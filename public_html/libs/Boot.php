@@ -1,7 +1,11 @@
 <?php
+namespace App;
+
+use App\Controllers;
 class Boot
 {
     private $route;
+    private $controllerPrefix = 'App\\Controllers\\';
     private $controllerName;
     private $controllerFile;
     private $controller;
@@ -9,30 +13,21 @@ class Boot
 
     public function __construct($argc = null, $argv = null)
     {
-        $this->loadFrameworkFiles();
-        if($argc && $argv) {
+        
+        if ($argc && $argv) {
             $actionKey = $this->getActionCli($argv);
             $this->generateCliRouting($argv, $actionKey);
             $this->setRequiredVariables();
             $this->runCli($argv);
-        }
-        else if(!$this->checkIsPost()) {
+        } else if (!$this->checkIsPost()) {
             $this->generateGetRouting();
             $this->setRequiredVariables();
             $this->runPage();
-        }
-        else
-        {
+        } else {
             $this->generatePostRouting();
             $this->setRequiredVariables();
             $this->runForm();
         }
-    }
-
-    private function loadFrameworkFiles()
-    {
-        include_once 'Controller.php';
-        include_once 'View.php';
     }
 
     private function checkIsPost()
@@ -43,7 +38,7 @@ class Boot
     private function generateGetRouting()
     {
         $this->route = explode('/', rtrim($_SERVER['REQUEST_URI'], '/'));
-        if(!isset($this->route[1])) {
+        if (!isset($this->route[1])) {
             $this->route[1] = '';
         }
         switch ($this->route[1]) {
@@ -62,26 +57,24 @@ class Boot
 
     private function setRequiredVariables()
     {
-        $this->controllerName = ucfirst($this->controllerName). 'Controller';
-        $this->controllerFile = sprintf('controllers/%s.php', $this->controllerName);
+        $this->controllerName = $this->controllerPrefix .ucfirst($this->controllerName). 'Controller';
     }
 
     private function runPage()
     {
-        if($this->importController()) {
+        if ($this->importController()) {
             $this->runAction();
         }
     }
   
     private function importController() :bool
     {
-        if(file_exists($this->controllerFile)) {
-            include_once $this->controllerFile;
-            $this->controller = new $this->controllerName;
+        try {
+            $this->controller = new $this->controllerName();
             return true;
         }
-        else
-        {
+        catch (\Throwable $th) {
+            var_dump($th);
             var_dump('File Not found');
             return false;
         }
@@ -91,15 +84,12 @@ class Boot
     {
         if (isset($this->route[2])) {
             $actionName = $this->route[2];
-            if(isset($this->route[3])) {
+            if (isset($this->route[3])) {
                 $this->controller->{$actionName}($this->route[3]);    
-            }
-            else {
+            } else {
                 $this->controller->{$actionName}();
             }
-        }
-        else
-        {
+        } else {
             $this->controller->index();
         }                
     }
@@ -122,21 +112,21 @@ class Boot
 
     private function runForm()
     {
-        if($this->importController()) {
+        if ($this->importController()) {
             $this->controller->{$this->formAction}(...array_values($this->postParms));
         }
     }
 
     private function runCli()
     {
-        if($this->importController()) {
+        if ($this->importController()) {
             $this->controller->{$this->cliAction}(...array_values($this->cliParms));
         }
     }
 
     private function getActionCli($argv)
     {
-        if(in_array('--action', $argv)) {
+        if (in_array('--action', $argv)) {
             $key = array_search('--action', $argv);
         }
         return $key+1;
@@ -174,7 +164,7 @@ class Boot
 
     private function setArgvParam($argv, $param)
     {
-        if(in_array($param, $argv)) {
+        if (in_array($param, $argv)) {
             $key = array_search($param, $argv)+1;
         }
         return $argv[$key];
